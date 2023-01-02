@@ -61,7 +61,7 @@ export const MV3Hmr = (): PluginOption => {
             .replace(/\/@vite\/client/g, '/dist/mv3client.mjs')
             .replace(/\/@id\//g, '/')
             .replace(/__uno.css/g, '~~uno.css')
-            .replace(/__x00__plugin-vue:export-helper/g, '~~x00__plugin-vue:export-helper.js')
+            .replace(/__x00__plugin-vue:export-helper/g, '~~x00__plugin-vue.export-helper.js')
             .replace(/(\/\.vite\/deps\/\S+?)\?v=\w+/g, '$1')
           if (isWin) {
             code = code

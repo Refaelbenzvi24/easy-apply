@@ -1,11 +1,11 @@
 {
-  "name": "vitesse-webext",
-  "displayName": "Vitesse WebExt",
-  "version": "0.0.1",
-  "private": true,
+  "name":           "vitesse-webext",
+  "displayName":    "Vitesse WebExt",
+  "version":        "0.0.1",
+  "private":        true,
   "packageManager": "pnpm@7.8.0",
-  "description": "[description]",
-  "scripts": {
+  "description":    "[description]",
+  "scripts":        {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
     "dev:prepare": "esno scripts/prepare.ts",
     "dev:web": "vite",
