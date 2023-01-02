@@ -15,13 +15,13 @@ export default defineConfig({
 		emptyOutDir: false,
 		sourcemap: isDev ? 'inline' : false,
 		lib: {
-			entry: r('src/contentScripts/index.ts'),
+			entry: r('src/contentScripts/autoFill.ts'),
 			name: packageJson.name,
 			formats: ['iife'],
 		},
 		rollupOptions: {
 			output: {
-				entryFileNames: 'index.global.js',
+				entryFileNames: 'autoFill.global.js',
 				extend: true,
 			},
 		},
