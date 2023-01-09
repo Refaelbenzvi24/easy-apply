@@ -1,4 +1,4 @@
-# Easy Apply - Web extension
+# Easy Apply - Browser extension
 
 <p align="center">
 <img width="655" src="./assets/icon-512.png"><br/>
