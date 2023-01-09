@@ -1,83 +1,78 @@
-# WebExtension Vite Starter
-
-A [Vite](https://vitejs.dev/) powered WebExtension ([Chrome](https://developer.chrome.com/docs/extensions/reference/), [FireFox](https://addons.mozilla.org/en-US/developers/), etc.) starter template.
+# Easy Apply - Web extension
 
 <p align="center">
-<sub>Popup</sub><br/>
-<img width="655" src="https://user-images.githubusercontent.com/11247099/126741643-813b3773-17ff-4281-9737-f319e00feddc.png"><br/>
-<sub>Options Page</sub><br/>
-<img width="655" src="https://user-images.githubusercontent.com/11247099/126741653-43125b62-6578-4452-83a7-bee19be2eaa2.png"><br/>
-<sub>Inject Vue App into the Content Script</sub><br/>
-<img src="https://user-images.githubusercontent.com/11247099/130695439-52418cf0-e186-4085-8e19-23fe808a274e.png">
+<img width="655" src="./assets/icon-512.png"><br/>
 </p>
 
-## Features
+## About
 
-- ⚡️ **Instant HMR** - use **Vite** on dev (no more refresh!)
-- 🥝 Vue 3 - Composition API, [`<script setup>` syntax](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0040-script-setup.md) and more!
-- 💬 Effortless communications - powered by [`webext-bridge`](https://github.com/antfu/webext-bridge) and [VueUse](https://github.com/antfu/vueuse) storage
-- 🌈 [UnoCSS](https://github.com/unocss/unocss) - The instant on-demand Atomic CSS engine.
-- 🦾 [TypeScript](https://www.typescriptlang.org/) - type safe
-- 📦 [Components auto importing](./src/components)
-- 🌟 [Icons](./src/components) - Access to icons from any iconset directly
-- 🖥 Content Script - Use Vue even in content script
-- 🌍 WebExtension - isomorphic extension for Chrome, Firefox, and others
-- 📃 Dynamic `manifest.json` with full type support
+This extension aims to help developers in their job search by providing a convenient way to quickly assess their experience for a given position and streamline the application process.
 
-## Pre-packed
+Here's what the extension does:
 
-### WebExtension Libraries
+1. Extracts the required experience for a job position from the job posting page and displays it to the user.
+2. Allows the user to set their own experience in years on the settings page of the extension.
+3. Show experience requirement in a way that the user can easily see if it is relevant to them. A red color indicates that the user does not meet the experience requirement, a green color indicates that the user meets the requirement, and an orange color indicates that the extension was unable to determine the relevance.
+4. Autofill job application forms with the user's information, saving them time and effort.
+5. Customization options: The user can customize the extension to their preference by specifying which information they want to be included when autofilling forms and by setting their own experience level on the settings page.
 
-- [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill) - WebExtension browser API Polyfill with types
-- [`webext-bridge`](https://github.com/antfu/webext-bridge) - effortlessly communication between contexts
 
-### Vite Plugins
+We hope these features save you time and help you in your job search.
 
-- [`unplugin-auto-import`](https://github.com/antfu/unplugin-auto-import) - Directly use `browser` and Vue Composition API without importing
-- [`unplugin-vue-components`](https://github.com/antfu/vite-plugin-components) - components auto import
-- [`unplugin-icons`](https://github.com/antfu/unplugin-icons) - icons as components
-  - [Iconify](https://iconify.design) - use icons from any icon sets [🔍Icônes](https://icones.netlify.app/)
 
-### Vue Plugins
+## Installation
 
-- [VueUse](https://github.com/antfu/vueuse) - collection of useful composition APIs
+### Unpacked
 
-### UI Frameworks
+1. Download the extension file from the releases page.
+2. Open Chrome or your preferred browser and go to the extensions page (chrome://extensions for Chrome).
+3. Enable developer mode by clicking the toggle in the top right corner (if using Chrome).
+4. Click the "Load unpacked" button and select the extension folder.
 
-- [UnoCSS](https://github.com/unocss/unocss) - the instant on-demand Atomic CSS engine
+### From Store
 
-### Coding Style
+1. Go to the extensions store
+2. Search for Easy Apply
+3. Download the extension
 
-- Use Composition API with [`<script setup>` SFC syntax](https://github.com/vuejs/rfcs/pull/227)
-- [ESLint](https://eslint.org/) with [@antfu/eslint-config](https://github.com/antfu/eslint-config), single quotes, no semi
-
-### Dev tools
-
-- [TypeScript](https://www.typescriptlang.org/)
-- [pnpm](https://pnpm.js.org/) - fast, disk space efficient package manager
-- [esno](https://github.com/antfu/esno) - TypeScript / ESNext node runtime powered by esbuild
-- [npm-run-all](https://github.com/mysticatea/npm-run-all) - Run multiple npm-scripts in parallel or sequential
-- [web-ext](https://github.com/mozilla/web-ext) - Streamlined experience for developing web extensions
-
-## Use the Template
-
-### GitHub Template
-
-[Create a repo from this template on GitHub](https://github.com/antfu/vitesse-webext/generate).
-
-### Clone to local
-
-If you prefer to do it manually with the cleaner git history
-
-> If you don't have pnpm installed, run: npm install -g pnpm
-
-```bash
-npx degit antfu/vitesse-webext my-webext
-cd my-webext
-pnpm i
-```
+## Configuration
+The extension can be configured to use specific information for each form field. To do this, click the extension icon in the top right corner of the browser window and select "Options". From there, you can choose which information to use for each field.
 
 ## Usage
+
+When you are on a job application page, you can click the autofill button in the popup window to fill out the form with the information you have previously provided.
+
+When you are viewing a job listing on LinkedIn, the extension will display the experience required for the job in the popup window.
+
+## Support
+
+If you have any questions or issues with the extension, please file a bug report on the GitHub page. We will do our best to address any issues in a timely manner.
+
+## Contributing
+
+Feel free to submit PRs for small issues. For large issues or features, open an issue first.
+
+### Option 1 - Simple Typo Fixes
+
+For small issues, like a typo or broken link, use Github's inline file editor or web editor (open by pressing . in your fork's code tab) to make the fix and submit a pull request.
+
+### Option 2 - Work on your own Fork
+
+For more complex contributions, like new features, you should work on the project on your local system.
+
+First, follow the steps in Running the project.
+
+```shell
+git checkout -b my-fix
+# fix some code / add feature...
+
+git commit -m "fix: corrected a typo"
+git push origin my-fix
+```
+
+Lastly, open a pull request on GitHub.
+
+## Technicalities
 
 ### Folders
 
@@ -120,12 +115,5 @@ pnpm build
 
 And then pack files under `extension`, you can upload `extension.crx` or `extension.xpi` to appropriate extension store.
 
-## Credits
 
-[![Volta](https://user-images.githubusercontent.com/904724/195351818-9e826ea9-12a0-4b06-8274-352743cd2047.png)](https://volta.net)
-
-This template is originally made for the [volta.net](https://volta.net) browser extension.
-
-## Variations
-
-This is a variant of [Vitesse](https://github.com/antfu/vitesse), check out the [full variations list](https://github.com/antfu/vitesse#variations).
+This repo's based on the [vitesse-webext](https://github.com/antfu/vitesse-webext) template.
