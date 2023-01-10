@@ -1,10 +1,10 @@
 {
   "name":            "easy-apply",
   "displayName":     "Easy Apply",
-  "version":         "0.0.1",
+  "version":         "0.1.0",
   "private":         true,
   "packageManager":  "pnpm@7.8.0",
-  "description":     "Easy Apply is a chrome extension that helps developers streamline their job search process. The extension extracts the required experience for a job posting and allows the user to set their own experience level in years on the settings page. It then displays the experience requirement in a way that the user can easily see if it is relevant to them, with red indicating that the user does not meet the requirement, green indicating that the user meets the requirement, and orange indicating that the relevance could not be determined. The extension also includes autofill functionality for job application forms and customization options for the user to specify which information they want included when autofilling forms. Easy Apply can be installed either by downloading the extension file from the releases page and loading it as an unpacked extension or by downloading it from the extensions store. The extension can be configured on the options page and used on job application pages by clicking the autofill button in the popup window. If you have any questions or issues with the extension, please feel free to open an issue on GitHub: https://github.com/Refaelbenzvi24/easy-apply.",
+  "description":     "Providing relevant experience indicators and autofill functionality for job applications.",
   "scripts":         {
     "dev":            "npm run clear && cross-env NODE_ENV=development run-p dev:*",
     "dev:prepare":    "esno scripts/prepare.ts",
