@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios";
 
 const requestsQueue: (() => void)[] = []
-const REQUESTS_DELAY = 1000
+const REQUESTS_DELAY = 600
 let delayHandlerIsWorking = false
 
 const delayHandler = () => {

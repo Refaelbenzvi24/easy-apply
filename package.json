@@ -1,7 +1,7 @@
 {
   "name":            "easy-apply",
   "displayName":     "Easy Apply",
-  "version":         "0.1.0",
+  "version":         "0.1.1",
   "private":         true,
   "packageManager":  "pnpm@7.8.0",
   "description":     "Providing relevant experience indicators and autofill functionality for job applications.",
@@ -49,7 +49,6 @@
     "eslint":                           "^8.25.0",
     "esno":                             "^0.16.3",
     "fs-extra":                         "^10.1.0",
-    "immer":                            "^9.0.17",
     "jsdom":                            "^20.0.3",
     "kolorist":                         "^1.6.0",
     "npm-run-all":                      "^4.1.5",

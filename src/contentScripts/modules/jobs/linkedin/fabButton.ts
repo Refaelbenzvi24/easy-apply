@@ -1,7 +1,13 @@
 import {App as VueApp} from "@vue/runtime-core";
-import {currentPageJobs} from "~/contentScripts/modules/jobs/linkedin";
 import App from "~/contentScripts/views/App.vue";
 import {waitForElmExistent} from "~/contentScripts/utils/utils";
+
+interface JobElementObject {
+	element: Element
+	isRelevant: boolean
+}
+
+export const currentPageJobs: JobElementObject[] = []
 
 let elementsAreInDom = true
 let fabButtonContainer: Element | undefined

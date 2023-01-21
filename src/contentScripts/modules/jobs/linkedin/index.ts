@@ -1,43 +1,12 @@
-import JobTechnologiesComponent from "~/components/JobTechnologies.vue"
-import {waitForElmExistent} from "~/contentScripts/utils/utils"
 import {userData, userSettings} from "~/logic"
-import {getJobExperience} from "~/contentScripts/modules/jobs/linkedin/experience";
-import {extractJobDescription} from "~/contentScripts/modules/jobs/linkedin/utils";
+import {getJobExperience} from "./experience";
+import {extractJobDescription} from "./descriptionParser";
+import {addParagraphElement, setExperienceParagraphStyle} from "./expereinceParagraph";
+import {jobListParams, nonJuniorJobTitles, singleJobParams} from "./constants";
+import {trackStats} from "./stats";
+import {appendTechnologiesComponent, technologiesFilter} from "./technologies";
 import {getPage} from "~/contentScripts/utils/requestsHelper";
-import {getQueryParamValue} from "~/contentScripts/utils/urlUtils";
-
-interface JobElementObject {
-	element: Element
-	isRelevant: boolean
-}
-
-export const currentPageJobs: JobElementObject[] = []
-
-interface LocationData {
-	lastPaginationStartValue: string | null | undefined
-}
-
-const locationData: LocationData = {
-	lastPaginationStartValue: null
-}
-
-export const technologiesFilter = (job: { title: string, description: string }) => {
-	const technologiesList = [
-		...userSettings.value.jobs.technologies.myTechnologies,
-		...userSettings.value.jobs.technologies.builtInTechnologies
-	]
-	return technologiesList.filter(technology =>
-		job.description
-		   .toLowerCase()
-		   .includes(technology.toLowerCase())
-		||
-		job.title
-		   .toLowerCase()
-		   .includes(technology.toLowerCase())
-	)
-}
-
-const nonJuniorJobTitles = ["senior", "technology director", "cto", "sr", "team lead", "tech lead", "chief", "architect", "teamlead"]
+import {waitForElmExistent} from "~/contentScripts/utils/utils"
 
 export const checkForNonJuniorTitles = (job: { title: string }) =>
 	nonJuniorJobTitles.map(title =>
@@ -56,81 +25,26 @@ export const getIsJobRelevant = (job: { title: string, description?: string }, j
 	)
 }
 
-
-export const extractJobId = (url: string) => url.split('jobs/view/')[1].split('/')[0]
-
-const setExperienceParagraphStyle = (jobExperience: number | string | null, isJobRelevant: boolean, paragraphElement: HTMLParagraphElement) => {
-	paragraphElement.className = ""
-	
-	if (!isJobRelevant) {
-		paragraphElement.style["color"] = "red"
-		paragraphElement.textContent = jobExperience === null ? 'Not mentioned' : `${jobExperience} years of experience required - not relevant`
-	}
-	
-	if (isJobRelevant) {
-		paragraphElement.style["color"] = jobExperience === null ? "orange" : "green"
-		paragraphElement.textContent = jobExperience === null ? 'Not mentioned' : `${jobExperience} years of experience required`
-	}
-}
-
-
-const getJobData = ({jobHtml, jobId, jobTitle}: { jobHtml: string, jobId: string, jobTitle: string }) => {
+const getJobData = (jobHtml: string, jobId: string, jobTitle: string) => {
 	const description = extractJobDescription(jobHtml, jobId)
 	const {highestValue, experience} = getJobExperience({title: jobTitle, description})
 	const technologies = technologiesFilter({title: jobTitle, description})
 	const isRelevant = getIsJobRelevant({description, title: jobTitle}, highestValue)
 	
-	
 	return {description, highestExperienceValue: highestValue, experience, isRelevant, technologies}
 }
 
-const appendTechnologiesComponent = (technologies: string[], parent: Element, insertBefore?: Element) => {
-	const container = document.createElement('div')
-	const app = createApp(JobTechnologiesComponent, {
-		technologies
-	})
-	
-	if (insertBefore) parent.insertBefore(container, insertBefore)
-	if (!insertBefore) parent.appendChild(container)
-	
-	app.mount(container)
-}
+export const extractJobId = (url: string) => url.split('jobs/view/')[1].split('/')[0]
 
-const getJobDetails = async (jobElement: Element) => {
-	const jobTitleEl = (await waitForElmExistent('a.job-card-list__title', jobElement)) as HTMLAnchorElement
+const getJobDetails = async (titleSelector: string, isJobList: boolean, jobElement?: Element) => {
+	const jobTitleEl = (await waitForElmExistent(titleSelector, jobElement)) as Element
 	
-	const jobTitle = jobTitleEl.text
-	const jobPath = jobTitleEl.attributes.getNamedItem('href')!.value
+	const jobTitle = jobTitleEl.innerHTML
+	const jobPath = isJobList ? jobTitleEl.attributes.getNamedItem('href')!.value : location.pathname
 	const jobId = extractJobId(jobPath)
-	const jobLink = `${document.location.origin}/jobs/view/${jobId}`
+	const jobHref = isJobList ? `${document.location.origin}/jobs/view/${jobId}` : location.href
 	
-	return {jobTitle, jobId, jobLink}
-}
-
-const handleParagraphElementInserting = (
-	insertBeforeElement: Element | undefined,
-	parent: Element,
-	insertBefore: Element | string | undefined,
-	paragraphElement: Element
-) => {
-	if (!userSettings.value.jobs.showExperience) return;
-	
-	if (insertBeforeElement instanceof Element) parent.insertBefore(paragraphElement, insertBeforeElement)
-	if (!insertBefore) parent.appendChild(paragraphElement)
-}
-
-const addParagraphElement = async (destinationSelector: string, contextElement?: Element, insertBefore?: Element | string) => {
-	const paragraphElement = document.createElement("p");
-	if (userSettings.value.jobs.showExperience)
-		paragraphElement.className = "job-card-container__ghost-placeholder job-card-container__ghost-placeholder--small"
-	
-	const parent = (await waitForElmExistent(destinationSelector, contextElement)) as HTMLDivElement
-	
-	const insertBeforeElement = (typeof insertBefore === 'string' ? await waitForElmExistent(insertBefore, contextElement) : insertBefore) as Element
-	
-	handleParagraphElementInserting(insertBeforeElement, parent, insertBefore, paragraphElement)
-	
-	return {paragraphElement, parent, insertBeforeElement}
+	return {jobTitle, jobHref, jobId}
 }
 
 export const jobRemovalHandler = (jobElement: Element, isRelevant: boolean, highestExperienceValue: number | null) => {
@@ -147,67 +61,48 @@ export const jobRemovalHandler = (jobElement: Element, isRelevant: boolean, high
 	}
 }
 
-const trackStats = (isRelevant: boolean | null, jobId: string) => {
-	if (!(isRelevant !== null && !userData.value.jobsSeen.includes(jobId))) return;
-	
-	userData.value.jobsSeen.push(jobId)
-	
-	if (!isRelevant) userData.value.stats.nonRelevantPositions += 1
-	if (isRelevant) userData.value.stats.relevantPositions += 1
+export interface AddJobInfoParams {
+	paragraphData: {
+		destinationSelector: string
+		contextElement?: Element
+		insertBefore?: string
+	}
+	isJobList: boolean
+	titleSelector: string
+	technologiesContainerSelector: string
 }
 
-export const addJobInfo = async (jobElement: Element) => {
-	const {paragraphElement} = await addParagraphElement('.artdeco-entity-lockup__caption', jobElement)
-	const {jobTitle, jobId, jobLink} = await getJobDetails(jobElement)
+export const addJobInfo = async (params: AddJobInfoParams, jobElement: Element = document.documentElement) => {
+	const {paragraphData, titleSelector, isJobList, technologiesContainerSelector} = params
 	
-	const {data: jobHtml}: { data: string } = await getPage(jobLink)
-	const {experience, highestExperienceValue, isRelevant, technologies} = getJobData({jobHtml, jobId, jobTitle})
+	const {paragraphElement, insertBeforeElement} =
+		await addParagraphElement(paragraphData.destinationSelector, jobElement, paragraphData.insertBefore)
+	const {jobId, jobHref, jobTitle} = await getJobDetails(titleSelector, isJobList, jobElement)
 	
-	const clickAbleJobContainer = jobElement.querySelector(('div.job-card-container--clickable')) as HTMLDivElement
+	const {data: jobHtml}: { data: string } = await getPage(jobHref)
+	const {experience, highestExperienceValue, isRelevant, technologies} = getJobData(jobHtml, jobId, jobTitle)
+	
+	const technologiesContainer = jobElement.querySelector(technologiesContainerSelector)!
 	
 	trackStats(isRelevant, jobId)
-	if (userSettings.value.jobs.showExperience) setExperienceParagraphStyle(experience!, isRelevant, paragraphElement)
-	if (userSettings.value.jobs.showTechnologies) appendTechnologiesComponent(technologies!, clickAbleJobContainer)
-	
-	currentPageJobs.push({
-		isRelevant,
-		element: jobElement
-	})
-	
-	if (userSettings.value.jobs.autoRemoveJobs) jobRemovalHandler(jobElement, isRelevant, highestExperienceValue!)
+	if (userSettings.value.jobs.showExperience) setExperienceParagraphStyle(experience, isRelevant, paragraphElement)
+	if (userSettings.value.jobs.showTechnologies) appendTechnologiesComponent(technologies, technologiesContainer, insertBeforeElement)
+	if (userSettings.value.jobs.autoRemoveJobs && isJobList) jobRemovalHandler(jobElement, isRelevant, highestExperienceValue)
 }
+
+export const handleSingleJob = async () => await addJobInfo(singleJobParams)
 
 export const handleJobList = async () => {
-	const currentLocationPaginationStartValue = getQueryParamValue('start')
-	if (locationData.lastPaginationStartValue === currentLocationPaginationStartValue) return;
-	
-	locationData.lastPaginationStartValue = currentLocationPaginationStartValue
 	const jobsUlEl = (await waitForElmExistent('ul.scaffold-layout__list-container')) as HTMLUListElement
+	const observer = new MutationObserver((mutationsList) => {
+		mutationsList.forEach((mutation) => {
+			mutation.addedNodes.forEach((value) => {
+				if (value.nodeName === 'LI' && value instanceof Element) void addJobInfo(jobListParams, value)
+			})
+		});
+	});
+	observer.observe(jobsUlEl, {subtree: false, childList: true});
+	
 	const jobs = jobsUlEl.querySelectorAll('li.ember-view.jobs-search-results__list-item')
-	await Promise.all(Array.from(jobs).map(async (job) => await addJobInfo(job)))
-}
-
-const getSingleJobDetails = () => {
-	const jobTitleEl = document.querySelector('body > div.application-outlet > div.authentication-outlet > div > div.job-view-layout.jobs-details > div.grid > div > div:nth-child(1) > div > div > div.p5 > h1')!
-	const jobId = extractJobId(location.pathname)
-	const jobTitle = jobTitleEl.textContent!
-	
-	return {jobId, jobTitle}
-}
-
-export const handleSingleJob = async () => {
-	locationData.lastPaginationStartValue = null
-	const {paragraphElement, parent, insertBeforeElement} = await addParagraphElement(
-		'body > div.application-outlet > div.authentication-outlet > div > div.job-view-layout.jobs-details > div.grid > div > div:nth-child(1) > div > div > div.p5',
-		document.documentElement,
-		'body > div.application-outlet > div.authentication-outlet > div > div.job-view-layout.jobs-details > div.grid > div > div:nth-child(1) > div > div > div.p5 > div.mt5.mb2'
-	)
-	
-	const {jobId, jobTitle} = getSingleJobDetails()
-	const {data: jobHtml}: { data: string } = await getPage(location.href)
-	const {experience, isRelevant, technologies} = getJobData({jobHtml, jobId, jobTitle})
-	
-	trackStats(isRelevant, jobId)
-	if (userSettings.value.jobs.showExperience) setExperienceParagraphStyle(experience!, isRelevant, paragraphElement)
-	if (userSettings.value.jobs.showTechnologies) appendTechnologiesComponent(technologies!, parent, insertBeforeElement as Element)
+	Array.from(jobs).map((job) => void addJobInfo(jobListParams, job))
 }
