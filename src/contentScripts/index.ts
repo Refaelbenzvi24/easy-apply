@@ -4,30 +4,43 @@ import {WebNavigation} from "webextension-polyfill"
 import {trackUrlChanges} from "~/contentScripts/utils/utils"
 import {handleJobList, handleSingleJob} from "~/contentScripts/modules/jobs/linkedin"
 import {userSettings} from "~/logic"
+import {getQueryParamValue} from "~/contentScripts/utils/urlUtils";
 
 
-const onPageLoad = async () => {
-	const {userExperience, showFabButton, filterNonJunior, ...jobSettings} = userSettings.value.jobs
-	const someJobSettingIsOn = Object.values(jobSettings).some(value => value)
-	
-	if (someJobSettingIsOn)
-		if (document.location.origin === 'https://www.linkedin.com') {
-			if (document.location.pathname.includes('/jobs/search/') || document.location.pathname.includes('/jobs/collections'))
-				await handleJobList()
-			
-			
-			if (document.location.pathname.includes('/jobs/view'))
-				await handleSingleJob()
-		}
+interface LocationData {
+	lastPaginationStartValue: string | null | undefined
 }
 
+const locationData: LocationData = {
+	lastPaginationStartValue: null
+}
+
+const routesHandler = async () => {
+	if (location.origin === 'https://www.linkedin.com') {
+		if (
+			(location.pathname.includes('/jobs/search/') || location.pathname.includes('/jobs/collections'))
+			&& location.search.includes('currentJobId')
+		) {
+			const currentLocationPaginationStartValue = getQueryParamValue('start')
+			if (locationData.lastPaginationStartValue === currentLocationPaginationStartValue) return;
+			locationData.lastPaginationStartValue = currentLocationPaginationStartValue
+			await handleJobList()
+		}
+		
+		if (location.pathname.includes('/jobs/view')) await handleSingleJob()
+	}
+}
+
+const onPageLoad = () => {
+	const {userExperience, showFabButton, filterNonJunior, ...jobSettings} = userSettings.value.jobs
+	const isSomeJobSettingOn = Object.values(jobSettings).some(value => value)
+	
+	if (isSomeJobSettingOn) void routesHandler()
+}
 
 const setStyleElement = () => {
 	const oldStyleEl = document.querySelector('#jobs-seeker-styles')
-	
-	if (oldStyleEl) {
-		oldStyleEl.remove()
-	}
+	if (oldStyleEl) oldStyleEl.remove()
 	
 	const styleEl = document.createElement('link')
 	styleEl.setAttribute('rel', 'stylesheet')
@@ -58,17 +71,10 @@ const triggerAutoFill = async () => {
 
 
 (async () => {
-	onMessage('auto-fill', async () => {
-		await triggerAutoFill()
-	})
+	onMessage('auto-fill', async () => await triggerAutoFill())
 	
 	setStyleElement()
 	
-	window.addEventListener('load', () => {
-		onPageLoad()
-	})
-	
-	trackUrlChanges(() => {
-		onPageLoad()
-	})
+	window.addEventListener('load', onPageLoad)
+	trackUrlChanges(onPageLoad)
 })()

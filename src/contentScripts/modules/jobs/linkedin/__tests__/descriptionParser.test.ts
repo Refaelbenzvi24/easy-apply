@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it} from "vitest";
 import fs from "fs";
 import {JSDOM} from "jsdom";
 
-import {DescriptionObject, extractJobDescription, linkedinJobDescriptionParser} from "~/contentScripts/modules/jobs/linkedin/utils";
+import {DescriptionObject, extractJobDescription, linkedinJobDescriptionParser} from "../descriptionParser";
 import {description as descriptionObject_3331088044} from "./data/linkedinJobDescriptionParser/jobData.3331088044.json"
 import {description as descriptionObject_3372582342} from "./data/linkedinJobDescriptionParser/jobData.3372582342.json"
 import {description_3331088044, description_3372582342} from "./data/linkedinJobDescriptionParser/descriptionResult.json"

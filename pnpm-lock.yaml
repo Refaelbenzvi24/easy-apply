@@ -23,7 +23,6 @@ specifiers:
   eslint: ^8.25.0
   esno: ^0.16.3
   fs-extra: ^10.1.0
-  immer: ^9.0.17
   jsdom: ^20.0.3
   kolorist: ^1.6.0
   npm-run-all: ^4.1.5
@@ -69,7 +68,6 @@ devDependencies:
   eslint: 8.30.0
   esno: 0.16.3
   fs-extra: 10.1.0
-  immer: 9.0.17
   jsdom: 20.0.3
   kolorist: 1.6.0
   npm-run-all: 4.1.5
@@ -3646,10 +3644,6 @@ packages:
 
   /immediate/3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
-    dev: true
-
-  /immer/9.0.17:
-    resolution: {integrity: sha512-+hBruaLSQvkPfxRiTLK/mi4vLH+/VQS6z2KJahdoxlleFOI8ARqzOF17uy12eFDlqWmPoygwc5evgwcp+dlHhg==}
     dev: true
 
   /immutable/4.2.1:
