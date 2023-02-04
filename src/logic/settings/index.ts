@@ -1,9 +1,9 @@
-import {DependsOnObject, Paths, SettingsObject} from "~/logic/settings/types";
+import {ConditionObject, Paths, SettingsObject} from "~/logic/settings/types";
 import {userSettingsInitialValue} from "~/logic/constant";
-import {getObjectAt} from "~/logic/utils";
+import {getObjectAt} from "~/logic/utils/utils";
 import {userSettings} from "~/logic";
 
-const checkDependsOn = (lastState: boolean, itemsToCheck: DependsOnObject<Paths<typeof userSettingsInitialValue>, false>[]): boolean => {
+const checkDependsOn = (lastState: boolean, itemsToCheck: ConditionObject<Paths<typeof userSettingsInitialValue>, false>[]): boolean => {
 	if (itemsToCheck.length === 0) return lastState
 	
 	const [currentItem, ...restItems] = itemsToCheck

@@ -5,7 +5,7 @@ import {trackUrlChanges} from "~/contentScripts/utils/utils"
 import {handleJobList, handleSingleJob} from "~/contentScripts/modules/jobs/linkedin"
 import {userSettings} from "~/logic"
 import {getQueryParamValue} from "~/contentScripts/utils/urlUtils";
-
+import {Router, routerHandler} from "~/contentScripts/modules/router";
 
 interface LocationData {
 	lastPaginationStartValue: string | null | undefined
@@ -15,27 +15,39 @@ const locationData: LocationData = {
 	lastPaginationStartValue: null
 }
 
-const routesHandler = async () => {
-	if (location.origin === 'https://www.linkedin.com') {
-		if (
-			(location.pathname.includes('/jobs/search/') || location.pathname.includes('/jobs/collections'))
-			&& location.search.includes('currentJobId')
-		) {
-			const currentLocationPaginationStartValue = getQueryParamValue('start')
-			if (locationData.lastPaginationStartValue === currentLocationPaginationStartValue) return;
-			locationData.lastPaginationStartValue = currentLocationPaginationStartValue
-			await handleJobList()
+const router: Router = {
+	routes: [
+		{
+			origin: 'https://www.linkedin.com',
+			routes: [
+				{
+					paths: ['/jobs/search', '/jobs/collection'],
+					customCheckers: [() => location.search.includes('currentJobId')],
+					callback: async () => {
+						const currentLocationPaginationStartValue = getQueryParamValue('start')
+						
+						if (locationData.lastPaginationStartValue === currentLocationPaginationStartValue) return;
+						
+						locationData.lastPaginationStartValue = currentLocationPaginationStartValue
+						await handleJobList()
+					},
+					fallback: () => locationData.lastPaginationStartValue = undefined
+				},
+				{
+					paths: ['/jobs/view'],
+					callback: async () => await handleSingleJob()
+				}
+			]
 		}
-		
-		if (location.pathname.includes('/jobs/view')) await handleSingleJob()
-	}
+	]
 }
+
 
 const onPageLoad = () => {
 	const {userExperience, showFabButton, filterNonJunior, ...jobSettings} = userSettings.value.jobs
 	const isSomeJobSettingOn = Object.values(jobSettings).some(value => value)
 	
-	if (isSomeJobSettingOn) void routesHandler()
+	if (isSomeJobSettingOn) void routerHandler(router)
 }
 
 const setStyleElement = () => {

@@ -6,8 +6,9 @@ export const waitForElmExistent = (selector: string, element?: Element) => new P
 	}
 	
 	const observer = new MutationObserver(() => {
-		if (getElement()) {
-			resolve(getElement());
+		const element = getElement()
+		if (element) {
+			resolve(element);
 			observer.disconnect();
 		}
 	});
@@ -42,4 +43,29 @@ export const trackUrlChanges = (onChange: () => void) => {
 		urlTrackerData.lastUrl = location.href
 		urlTrackerData.callbacks.forEach(callback => callback())
 	}).observe(document, {subtree: true, childList: true})
+}
+
+
+export const onElementVisibleFor = (callback: () => void, {element, timeout}: { element: Element, timeout: number }) => {
+	let timer: NodeJS.Timeout
+	
+	const config = {
+		root: null,
+		threshold: 0
+	};
+	
+	const observer = new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			
+			if (entry.isIntersecting) {
+				timer = setTimeout(() => {
+					callback()
+				}, timeout);
+			} else {
+				clearTimeout(timer);
+			}
+		});
+	}, config);
+	
+	observer.observe(element);
 }

@@ -1,8 +1,4 @@
-interface JobObject {
-	data: {
-		description: DescriptionObject
-	}
-}
+import {sendMessage} from "webext-bridge";
 
 export interface DescriptionObject {
 	attributes: {
@@ -49,19 +45,10 @@ export const linkedinJobDescriptionParser = (descriptionObject: DescriptionObjec
 	}).filter(line => line.length > 0)
 }
 
-
-export const extractJobDescription = (html: string, jobId: string) => {
-	const parser = new DOMParser()
-	const doc = parser.parseFromString(html, 'text/html')
-	const codeElements = doc.querySelectorAll('code')
+export const extractJobDescription = async (jobId: string) => {
+	const jobDetailsResponse = await sendMessage('get-linkedin-job-details', {jobId})
 	
-	return Array.from(codeElements).map(element => {
-		if (element.innerHTML.includes(`fsd_jobPosting:${jobId}`)) {
-			const descriptionObject: JobObject = JSON.parse(element.innerHTML)
-			
-			return linkedinJobDescriptionParser(descriptionObject.data.description).join('\n')
-		}
-		
-		return null
-	}).filter(item => item !== null)[0] as string
+	if (jobDetailsResponse.status === 'failed') throw 'an error occurred while getting job details from linkedin server'
+	
+	return linkedinJobDescriptionParser(jobDetailsResponse.jobDetails.data.description).join('\n')
 }

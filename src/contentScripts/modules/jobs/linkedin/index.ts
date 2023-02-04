@@ -5,7 +5,6 @@ import {addParagraphElement, setExperienceParagraphStyle} from "./expereincePara
 import {jobListParams, nonJuniorJobTitles, singleJobParams} from "./constants";
 import {trackStats} from "./stats";
 import {appendTechnologiesComponent, technologiesFilter} from "./technologies";
-import {getPage} from "~/contentScripts/utils/requestsHelper";
 import {waitForElmExistent} from "~/contentScripts/utils/utils"
 
 export const checkForNonJuniorTitles = (job: { title: string }) =>
@@ -25,8 +24,8 @@ export const getIsJobRelevant = (job: { title: string, description?: string }, j
 	)
 }
 
-const getJobData = (jobHtml: string, jobId: string, jobTitle: string) => {
-	const description = extractJobDescription(jobHtml, jobId)
+const getJobData = async (jobId: string, jobTitle: string) => {
+	const description = await extractJobDescription(jobId)
 	const {highestValue, experience} = getJobExperience({title: jobTitle, description})
 	const technologies = technologiesFilter({title: jobTitle, description})
 	const isRelevant = getIsJobRelevant({description, title: jobTitle}, highestValue)
@@ -77,10 +76,8 @@ export const addJobInfo = async (params: AddJobInfoParams, jobElement: Element =
 	
 	const {paragraphElement, insertBeforeElement} =
 		await addParagraphElement(paragraphData.destinationSelector, jobElement, paragraphData.insertBefore)
-	const {jobId, jobHref, jobTitle} = await getJobDetails(titleSelector, isJobList, jobElement)
-	
-	const {data: jobHtml}: { data: string } = await getPage(jobHref)
-	const {experience, highestExperienceValue, isRelevant, technologies} = getJobData(jobHtml, jobId, jobTitle)
+	const {jobId, jobTitle} = await getJobDetails(titleSelector, isJobList, jobElement)
+	const {experience, highestExperienceValue, isRelevant, technologies} = await getJobData(jobId, jobTitle)
 	
 	const technologiesContainer = jobElement.querySelector(technologiesContainerSelector)!
 	

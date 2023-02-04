@@ -19,7 +19,7 @@ export type Paths<T, D extends number = 10> = [D] extends [never] ? never : T ex
 type Leaves<T, D extends number = 10> = [D] extends [never] ? never : T extends object ?
 	{ [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T] : "";
 
-export type DependsOnObject<T extends string, FirstItem extends boolean> =
+export type ConditionObject<T extends string, FirstItem extends boolean> =
 	FirstItem extends true ? {
 		key: T
 	} : {
@@ -28,8 +28,8 @@ export type DependsOnObject<T extends string, FirstItem extends boolean> =
 	}
 
 export type DependsOnArray<T extends string> = [
-	DependsOnObject<T, true>,
-	...DependsOnObject<T, false>[]
+	ConditionObject<T, true>,
+	...ConditionObject<T, false>[]
 ]
 
 export interface SettingsObject {

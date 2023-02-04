@@ -22,7 +22,7 @@ export async function getManifest() {
 			open_in_tab: true,
 		},
 		background: {
-			service_worker: './dist/background/index.mjs',
+			service_worker: './dist/background/index.mjs'
 		},
 		icons: {
 			16: './assets/icon-512.png',
@@ -34,7 +34,8 @@ export async function getManifest() {
 			'storage',
 			'activeTab',
 			'scripting',
-			'webNavigation'
+			'webNavigation',
+			'cookies'
 		],
 		host_permissions: ['<all_urls>'],
 		content_scripts: [

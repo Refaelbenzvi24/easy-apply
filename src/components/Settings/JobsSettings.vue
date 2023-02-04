@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {jobsSettings} from "~/logic/settings/jobsSettings";
+import {jobsSettings} from "~/logic/settings/constants/jobsSettings";
 import SettingsPanel from "~/components/Settings/SettingsPanel.vue";
 import ConfirmationDialog from "~/components/Dialogs/ConfirmationDialog.vue";
 import {useToggle} from "@vueuse/core";

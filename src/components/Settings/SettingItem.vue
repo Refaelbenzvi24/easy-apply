@@ -4,7 +4,7 @@ import ToggleSwitch from "~/components/UI/Switch/ToggleSwitch.vue"
 import TextField from "~/components/UI/Form/TextField.vue"
 import {SettingsObject} from "~/logic/settings/types"
 import {userSettings} from "~/logic"
-import {getObjectAt, setValueAt} from "~/logic/utils"
+import {getObjectAt, setValueAt} from "~/logic/utils/utils"
 import {isSettingDisabled} from "~/logic/settings"
 import {validate} from "~/logic/validations"
 import List from "~/components/UI/List/List.vue";

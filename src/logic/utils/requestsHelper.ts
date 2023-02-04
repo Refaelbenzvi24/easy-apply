@@ -1,5 +1,3 @@
-import axios, {AxiosResponse} from "axios";
-
 const requestsQueue: (() => void)[] = []
 const REQUESTS_DELAY = 600
 let delayHandlerIsWorking = false
@@ -15,10 +13,14 @@ const delayHandler = () => {
 	}, REQUESTS_DELAY)
 }
 
-export const getPage = (pageUrl: string): Promise<AxiosResponse> => new Promise((resolve) => {
+export const queueRequest = (url: string, config?: RequestInit): Promise<any> => new Promise((resolve, reject) => {
 	if (!delayHandlerIsWorking) delayHandler()
 	
 	requestsQueue.push(async () => {
-		return resolve(await axios.get(pageUrl))
+		const response = await fetch(url, config)
+		
+		if (!response.ok) reject(await response.json())
+		
+		return resolve(await response.json())
 	})
 })
