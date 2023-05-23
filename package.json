@@ -1,7 +1,7 @@
 {
   "name": "easy-apply",
   "displayName": "Easy Apply",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "private": true,
   "packageManager": "pnpm@7.8.0",
   "description": "Providing relevant experience indicators and autofill functionality for job applications.",
