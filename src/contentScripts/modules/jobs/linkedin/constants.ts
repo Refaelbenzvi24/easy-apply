@@ -8,7 +8,7 @@ export const jobListParams: AddJobInfoParams = {
 	},
 	isJobList: true,
 	titleSelector: 'a.job-card-list__title',
-	technologiesContainerSelector: 'div.job-card-container--clickable'
+	technologiesContainerSelector: 'div.job-card-container--clickable > div'
 }
 
 export const singleJobParams: AddJobInfoParams = {
